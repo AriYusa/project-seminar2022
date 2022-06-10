@@ -8,7 +8,7 @@ import statsmodels.api as sm
 from sklearn.metrics import mean_absolute_error
 
 
-def tsplot(y, lags=None, figsize=(12, 7)):
+def tsplot(y, lags=None, figsize=(12, 7)) -> None:
     """
     Plot time series, its ACF and PACF, calculate Dickaey–Fuller test
     :param y: timeseries
@@ -37,7 +37,7 @@ def tsplot(y, lags=None, figsize=(12, 7)):
         plt.tight_layout()
 
 
-def plotMovingAverage(series, window, plot_intervals=False, scale=1.96, plot_anomalies=False):
+def plotMovingAverage(series, window, plot_intervals=False, scale=1.96, plot_anomalies=False) -> None:
     """
     Plots a graph.
     :param series: dataframe with timeseries
@@ -46,13 +46,7 @@ def plotMovingAverage(series, window, plot_intervals=False, scale=1.96, plot_ano
     :param scale: number of standard deviations used to identify anomalies
     :param plot_anomalies: whether to show anomalies
     """
-    """
-        series - dataframe with timeseries
-        window - rolling window size
-        plot_intervals - show confidence intervals
-        plot_anomalies - show anomalies
 
-    """
     rolling_mean = series.rolling(window=window).mean()
 
     plt.figure(figsize=(15, 5))

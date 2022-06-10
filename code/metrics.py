@@ -33,6 +33,6 @@ def resample_monthly(y_true: pd.Series, y_pred: Union[np.ndarray, pd.Series, Lis
     if not isinstance(y_true.index, pd.DatetimeIndex):
         raise TypeError(f"Type of index must be pd.DatetimeIndex, but got {type(y_true.index)}")
 
-    y_true = y_true.resample('MS').apply(sum)
     y_pred = pd.Series(y_pred, index=y_true.index).resample('MS').apply(sum)
+    y_true = y_true.resample('MS').apply(sum)
     return y_true, y_pred

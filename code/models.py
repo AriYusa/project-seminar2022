@@ -29,8 +29,10 @@ def cal_new_cols(data: pd.DataFrame, target_column: str, date_column: str, lags:
 
     # расчёт средних значений по номеру недели в году
     if on_weekmean:
-        data['Week_Number'] = data[date_column].dt.week
+        data['Week_Number'] = pd.to_datetime(data[date_column]).dt.isocalendar().week
         week_means = data.iloc[:-n_test].groupby('Week_Number')[target_column].mean()
+        if 53 not in week_means.keys():
+          week_means[53] = week_means[1]
         data['Week_mean'] = data['Week_Number'].apply(lambda w_n: week_means[w_n])
         if not on_date:
             data = data.drop('Week_Number', axis=1)
