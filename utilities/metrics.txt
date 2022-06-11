@@ -1,5 +1,0 @@
-def wape(y_true, y_pred):
-    return np.sum(np.abs(y_true - y_pred)) / y_true.sum()
-
-def quality(y_true, y_pred):
-    return 1 - wape(y_true, y_pred)

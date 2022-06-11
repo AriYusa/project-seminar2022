@@ -8,11 +8,20 @@ warnings.filterwarnings("ignore")
 
 
 if __name__ == '__main__':
-    #preprocess_data()
+    print('Preprocessing data...')
+    preprocess_data()
 
-    # result = pd.DataFrame([], columns=['Period', 'DFU', 'Customer', 'Total Sell-in', 'BPV', 'predicted'])
+    print('Getting predictions for distributors...')
     dist_dataframe = dist_predict()
+    print(f"Distributors WAPE {wape(dist_dataframe['BPV'], dist_dataframe['predicted'])}")
+
+    print('Getting predictions for a trading network...')
     net_dataframe = net_predict()
+    print(f"Nets WAPE {wape(net_dataframe['BPV'], net_dataframe['predicted'])}")
 
     result = pd.concat((dist_dataframe, net_dataframe))
-    print(f"Distributors WAPE {wape(result['BPV'], result['predicted'])}")
+    print(f"Overall WAPE {wape(result['BPV'], result['predicted'])}")
+    file_dest = 'result.xlsx'
+    result.to_excel(file_dest)
+    print(f"Results have been saved successfully to {file_dest}!")
+

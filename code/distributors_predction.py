@@ -83,7 +83,6 @@ def dist_predict():
         test['Customer'] = customer
         test['DFU'] = dfu
 
-        print(f"Customer {customer}: WAPE {wape(test['BPV'],test['predicted'])}")
 
         test = test.reset_index()
 
