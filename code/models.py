@@ -1,6 +1,9 @@
 import pandas as pd
 import numpy as np
 from typing import Iterable, Dict, Tuple
+
+from sktime.forecasting.base import ForecastingHorizon
+
 from metrics import *
 
 
@@ -32,7 +35,7 @@ def cal_new_cols(data: pd.DataFrame, target_column: str, date_column: str, lags:
         data['Week_Number'] = pd.to_datetime(data[date_column]).dt.isocalendar().week
         week_means = data.iloc[:-n_test].groupby('Week_Number')[target_column].mean()
         if 53 not in week_means.keys():
-          week_means[53] = week_means[1]
+            week_means[53] = week_means[1]
         data['Week_mean'] = data['Week_Number'].apply(lambda w_n: week_means[w_n])
         if not on_date:
             data = data.drop('Week_Number', axis=1)
@@ -138,6 +141,9 @@ def walk_forward_prediction(train: pd.DataFrame, test: pd.DataFrame, target_colu
         data = cal_new_cols(data, 'BPV', date_column, lags, n_test, calc_features)
         train_data, test_data = train_test_split(data, n_test)
 
+    predictions = np.array(predictions)
+    predictions = np.where(predictions < 0, 0, predictions)
+
     return trues, predictions
 
 
@@ -165,3 +171,32 @@ def extending_window_cv(data: pd.DataFrame, target_column: str, date_column: str
         score = wape(*resample_monthly(test['BPV'], predictions))
         scores.append(score)
     return np.array(scores).mean()
+
+
+def predict_tbats(train, test, target_column, freq, model):
+    train.index = pd.PeriodIndex(train.index, freq=freq)
+    test.index = pd.PeriodIndex(test.index, freq=freq)
+
+    fitted_model = model.fit(train[target_column])
+    preds = fitted_model.forecast(steps=len(test))
+
+    test.index = test.index.astype('datetime64[ns]')
+    preds = np.where(preds < 0, 0, preds)
+
+    return preds
+
+
+def predict_sktime(train, test, target_column, freq, model):
+    train.index = pd.PeriodIndex(train.index, freq=freq)
+    test.index = pd.PeriodIndex(test.index, freq=freq)
+
+    fh_test = ForecastingHorizon(test.index, is_relative=False)
+
+    model.fit(train[target_column])
+    preds = model.predict(fh_test)
+
+    test.index = test.index.astype('datetime64[ns]')
+    preds.index = preds.index.astype('datetime64[ns]')
+    preds = np.where(preds < 0, 0, preds)
+
+    return preds
