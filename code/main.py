@@ -1,6 +1,4 @@
 import pandas as pd
-import  pipreqs
-
 from metrics import wape
 from data_preprocessing import preprocess_data
 from distributors_predction import dist_predict
